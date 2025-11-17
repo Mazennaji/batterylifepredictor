@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 List<Drainer> drainers  = [
   Drainer(name: 'WIFI', extraDrain: 1.1),
   Drainer(name: 'Bluetooth', extraDrain: 1.5),
@@ -20,3 +21,17 @@ class Drainer {
     isSelected = !isSelected;
   }
 }
+class combinedCheckbox extends StatefulWidget {
+  const combinedCheckbox({super.key});
+
+  @override
+  State<combinedCheckbox> createState() => _combinedCheckboxState();
+}
+
+class _combinedCheckboxState extends State<combinedCheckbox> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
