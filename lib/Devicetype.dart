@@ -19,7 +19,7 @@ class _State extends State<Devicetype> {
         });
       },
       dropdownMenuEntries:devices.map<DropdownMenuEntry<Battery>>((Battery battery){//maps the entries of the devices list as a dropdown
-        return DropdownMenuEntry(value: battery, label:devices.name);
+        return DropdownMenuEntry(value: battery, label:battery.name);
 
     }).toList(),
     );
