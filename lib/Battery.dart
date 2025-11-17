@@ -24,11 +24,11 @@ class Battery {
 
   // Calculate total drain including selected drainers
   double _calculateTotalDrain() {
-    double total = 0;
     String usage = '';
+    double total = 0;
     if(usage == 'light'){total = 150;}
     else if (usage == 'medium'){total = 200;}
-    else{total = 100;}
+    else{total = 300;}
     for (var drainer in drainers) {
       if (drainer.isSelected) {
         total += drainer.extraDrain;
