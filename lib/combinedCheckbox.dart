@@ -20,18 +20,39 @@ class _CombinedCheckboxState extends State<CombinedCheckbox> {
   Widget build(BuildContext context) {
     return Column(
       children: widget.drainers.map((drainer) {
-        return CheckboxListTile(
-          title: Text(drainer.name, style: TextStyle(fontSize: 18)),
-          subtitle: Text("Extra drain: ${drainer.extraDrain} mAh/hr"),
-          value: drainer.isSelected,
-          onChanged: (bool? selected) {
-            setState(() {
-              drainer.isSelected = selected!;
-            });
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,   // CENTER EVERYTHING
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Checkbox
+              Checkbox(
+                value: drainer.isSelected,
+                onChanged: (bool? selected) {
+                  setState(() {
+                    drainer.isSelected = selected!;
+                  });
+                  if (widget.onUpdate != null) widget.onUpdate!();
+                },
+              ),
 
-            // Notify parent widget (optional)
-            if (widget.onUpdate != null) widget.onUpdate!();
-          },
+              // Name + Subtitle
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // text still left-aligned under each other
+                children: [
+                  Text(
+                    drainer.name,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    "Extra drain: ${drainer.extraDrain} mAh/hr",
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
