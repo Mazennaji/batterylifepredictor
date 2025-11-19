@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 List<Drainer> drainers  = [
   Drainer(name: 'WIFI', extraDrain: 1.1),
   Drainer(name: 'Bluetooth', extraDrain: 1.5),
-  Drainer(name: 'Volume', extraDrain: 1.2)
+  Drainer(name: 'Volume', extraDrain: 1.2),
 ];
 class Drainer {
   String name;       // public attribute
