@@ -23,7 +23,7 @@ class _CombinedCheckboxState extends State<CombinedCheckbox> {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,   // CENTER EVERYTHING
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Checkbox
