@@ -14,13 +14,20 @@ class _HomeState extends State<Home> {
   String usage = 'Light';
   bool showResult = false;
   double displayedBatteryLife = 0.0;
+  double displayedEnergyImpact = 0.0;
 
   void updateUsage(String newUsage) {
-    setState(() => usage = newUsage);
+    setState(() {
+      usage = newUsage;
+      showResult = false;
+    });
   }
 
   void updateBattery(Battery battery) {
-    setState(() => selectedBattery = battery);
+    setState(() {
+      selectedBattery = battery;
+      showResult = false;
+    });
   }
 
   double getUsageDrain() {
@@ -35,6 +42,14 @@ class _HomeState extends State<Home> {
       if (d.isSelected) total += d.extraDrain;
     }
     return selectedBattery.capacity / total;
+  }
+
+  double calculateEnergyImpact() {
+    double total = getUsageDrain();
+    for (var d in drainers) {
+      if (d.isSelected) total += d.extraDrain;
+    }
+    return total / 100;
   }
 
   @override
@@ -78,11 +93,13 @@ class _HomeState extends State<Home> {
   Widget _nav(String text, String route) {
     return TextButton(
       onPressed: () => Navigator.pushNamed(context, route),
-      child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 18)),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white, fontSize: 18),
+      ),
     );
   }
 
-  // DEVICE SELECTION
   Widget _deviceCard(bool dark) {
     return _card(
       dark,
@@ -101,7 +118,6 @@ class _HomeState extends State<Home> {
 
   Widget _deviceBtn(IconData icon, String label, Battery battery, bool dark) {
     bool selected = selectedBattery == battery;
-
     return Column(
       children: [
         IconButton(
@@ -125,7 +141,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // USAGE CARD
   Widget _usageCard(bool dark) {
     return _card(
       dark,
@@ -146,7 +161,6 @@ class _HomeState extends State<Home> {
 
   Widget _usageOption(IconData icon, String level, bool dark) {
     bool selected = usage == level;
-
     return Row(
       children: [
         Icon(
@@ -172,7 +186,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // DRAINERS
   Widget _drainerCard(bool dark) {
     return _card(
       dark,
@@ -208,28 +221,34 @@ class _HomeState extends State<Home> {
             Text(
               d.name,
               style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: dark ? Colors.white : Colors.black),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: dark ? Colors.white : Colors.black,
+              ),
             ),
             Text(
               "Extra drain: ${d.extraDrain} mAh/hr",
               style: TextStyle(
-                  fontSize: 13,
-                  color: dark ? Colors.grey.shade300 : Colors.grey),
+                fontSize: 13,
+                color: dark ? Colors.grey.shade300 : Colors.grey,
+              ),
             ),
           ],
         ),
         const SizedBox(width: 20),
         Checkbox(
           value: d.isSelected,
-          onChanged: (v) => setState(() => d.isSelected = v!),
+          onChanged: (v) {
+            setState(() {
+              d.isSelected = v!;
+              showResult = false;
+            });
+          },
         ),
       ],
     );
   }
 
-  // RESULT
   Widget _resultCard(bool dark) {
     return _card(
       dark,
@@ -246,11 +265,14 @@ class _HomeState extends State<Home> {
                 color: dark ? Colors.white : Colors.blue.shade700,
               ),
             ),
+          if (showResult) const SizedBox(height: 20),
+          if (showResult) batteryGauge(displayedEnergyImpact, dark),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () {
               setState(() {
                 displayedBatteryLife = calculateBatteryLife();
+                displayedEnergyImpact = calculateEnergyImpact();
                 showResult = true;
               });
             },
@@ -268,8 +290,10 @@ class _HomeState extends State<Home> {
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: dark ? Colors.white : Colors.blue.shade700,
-              padding:
-              const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+              padding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 24,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -280,7 +304,44 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // CARD TEMPLATE
+  Widget batteryGauge(double impact, bool dark) {
+    double value = impact;
+    if (value < 0) value = 0;
+    if (value > 5) value = 5;
+
+    Color color = Colors.green;
+    if (value >= 3) {
+      color = Colors.red;
+    } else if (value >= 2) {
+      color = Colors.yellow;
+    }
+
+    return Column(
+      children: [
+        SizedBox(
+          width: 200,
+          height: 100,
+          child: CustomPaint(
+            painter: GaugePainter(value, color, dark),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value >= 3
+              ? "High Energy Impact"
+              : value >= 2
+              ? "Medium Energy Impact"
+              : "Low Energy Impact",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _card(bool dark, String title, IconData icon, Widget child) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -288,16 +349,19 @@ class _HomeState extends State<Home> {
         color: dark ? Colors.grey.shade800 : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: dark ? Colors.grey.shade700 : Colors.grey.shade300),
+          color: dark ? Colors.grey.shade700 : Colors.grey.shade300,
+        ),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon,
-                  size: 22,
-                  color: dark ? Colors.white : Colors.blue.shade700),
+              Icon(
+                icon,
+                size: 22,
+                color: dark ? Colors.white : Colors.blue.shade700,
+              ),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -315,4 +379,35 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+}
+
+class GaugePainter extends CustomPainter {
+  final double value;
+  final Color color;
+  final bool dark;
+
+  GaugePainter(this.value, this.color, this.dark);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+
+    final backgroundPaint = Paint()
+      ..color = dark ? Colors.grey.shade700 : Colors.grey.shade300
+      ..strokeWidth = 18
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final foregroundPaint = Paint()
+      ..color = color
+      ..strokeWidth = 18
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(rect, 3.14, 3.14, false, backgroundPaint);
+    canvas.drawArc(rect, 3.14, 3.14 * (value / 5), false, foregroundPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
