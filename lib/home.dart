@@ -4,58 +4,48 @@ import 'drainer.dart';
 import 'Usageintensity.dart';
 import 'DeviceType.dart';
 import 'combinedCheckbox.dart';
-
+import 'Settings.dart';
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const  Home({super.key});
   @override
   State<Home> createState() => _HomeState();
 }
-
 class _HomeState extends State<Home> {
-  Battery selectedBattery = devices[0]; // default device
+  Battery selectedBattery = devices[0];
   String usage = 'Light';
-
-  bool showResult = false; // ⭐ Controls showing the text
-  double displayedBatteryLife = 0.0; // ⭐ Stores last result
-
-  // Update usage from the radio buttons
+  bool showResult = false;
+  double displayedBatteryLife = 0.0;
   void updateUsage(String newUsage) {
     setState(() {
       usage = newUsage;
     });
   }
-
-  // Update battery from dropdown
   void updateBattery(Battery battery) {
     setState(() {
       selectedBattery = battery;
     });
   }
-
-  // Calculate total drain based on the usage from user
   double getUsageDrain() {
     if (usage == 'Light') return 150;
     if (usage == 'Moderate') return 200;
     return 300; // High
   }
-
-  // Calculate total battery life
   double calculateBatteryLife() {
     double totalDrain = getUsageDrain();
-
     for (var drainer in drainers) {
       if (drainer.isSelected) {
         totalDrain += drainer.extraDrain;
       }
     }
-
-    if (totalDrain <= 0 || totalDrain.isNaN) return 0.0; // prevent crash
-
+    if (totalDrain <= 0 || totalDrain.isNaN) return 0.0;
     return selectedBattery.capacity / totalDrain;
   }
-
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      screenWidth = screenWidth * 0.8;
+    }
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -66,6 +56,19 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: Colors.blue.shade700,
         elevation: 2,
+        actions: [
+            TextButton(onPressed:(){
+              ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(content: Text('You are already on Home')),
+    );
+    },
+        child: Text('Home', style: TextStyle(fontSize: 18, color: Colors.white))
+            ),
+            TextButton(onPressed:(){
+            Navigator.pushNamed(context,'/settings');
+            },
+            child:Text('Settings',style:TextStyle(fontSize:18,color:Colors.white),))
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -97,10 +100,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // ------------------- BATTERY RESULT -------------------
               _buildCenteredResultCard(),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -108,7 +108,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
   Widget _buildCenteredCard({
     required String title,
     required IconData icon,
@@ -153,8 +152,6 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-  // ⭐ Updated result card with button + stored value
   Widget _buildCenteredResultCard() {
     return Container(
       width: double.infinity,
@@ -196,8 +193,6 @@ class _HomeState extends State<Home> {
             ),
             const SizedBox(height: 20),
           ],
-
-          // ⭐ BUTTON: updates only when pressed
           ElevatedButton(
             onPressed: () {
               setState(() {
