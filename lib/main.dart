@@ -8,10 +8,22 @@ class myapp extends StatefulWidget {
   State<myapp> createState() => _myappState();
 }
 class _myappState extends State<myapp> {
+  bool notification=false;
   bool isDarkMode=false;
   void updateTheme(bool val){
     setState(() {
       isDarkMode=val;
+    });
+  }
+  void updateNotification(bool val){
+    setState(() {
+      notification=val;
+    });
+  }
+  void resetDefault(){
+    setState(() {
+      isDarkMode=false;
+      notification=false;
     });
   }
   @override
@@ -22,7 +34,7 @@ class _myappState extends State<myapp> {
         initialRoute:'/',
         routes:{
         '/':(context)=>Home(),
-          '/settings':(context)=>Settings(isDarkMode: isDarkMode, onThemeChanged:updateTheme)
+          '/settings':(context)=>Settings(isDarkMode:isDarkMode,onThemeChanged:updateTheme,notification:notification,onNotificationChange:updateNotification,resetDefaults:resetDefault,)
         },
         theme:ThemeData.light(),
       darkTheme:ThemeData.dark(),
