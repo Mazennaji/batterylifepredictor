@@ -65,12 +65,60 @@ class _HomeState extends State<Home> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        actions: [
-          _nav("Home", '/'),
-          _nav("Settings", '/settings'),
-          _nav("About", '/about'),
-        ],
       ),
+
+      drawer: Drawer(
+        backgroundColor: dark ? Colors.grey.shade800 : Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: dark ? Colors.black : Colors.blue.shade700,
+              ),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  "Menu",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            ListTile(
+              leading: Icon(Icons.home,
+                  color: dark ? Colors.white : Colors.blue.shade700),
+              title: Text("Home",
+                  style: TextStyle(
+                      color: dark ? Colors.white : Colors.black, fontSize: 18)),
+              onTap: () => Navigator.pushNamed(context, '/'),
+            ),
+
+            ListTile(
+              leading: Icon(Icons.settings,
+                  color: dark ? Colors.white : Colors.blue.shade700),
+              title: Text("Settings",
+                  style: TextStyle(
+                      color: dark ? Colors.white : Colors.black, fontSize: 18)),
+              onTap: () => Navigator.pushNamed(context, '/settings'),
+            ),
+
+            ListTile(
+              leading: Icon(Icons.info,
+                  color: dark ? Colors.white : Colors.blue.shade700),
+              title: Text("About",
+                  style: TextStyle(
+                      color: dark ? Colors.white : Colors.black, fontSize: 18)),
+              onTap: () => Navigator.pushNamed(context, '/about'),
+            ),
+          ],
+        ),
+      ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -86,16 +134,6 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _nav(String text, String route) {
-    return TextButton(
-      onPressed: () => Navigator.pushNamed(context, route),
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white, fontSize: 18),
       ),
     );
   }
